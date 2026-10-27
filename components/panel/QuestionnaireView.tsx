@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { formatEther, type Address } from "viem";
-import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { useWriteContract, useWaitForTransactionReceipt, useBlock } from "wagmi";
 import Button from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { panelAbi } from "@/lib/botchain/abi";
@@ -42,11 +42,15 @@ export default function QuestionnaireView({
 }: QuestionnaireViewProps) {
   const { toast } = useToast();
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [submittedOption, setSubmittedOption] = useState<number | null>(null);
 
-  const status = statusOf(survey);
+  const { data: block } = useBlock();
+  const nowSecs = block?.timestamp ? Number(block.timestamp) : Math.floor(Date.now() / 1000);
+  const status = statusOf(survey, nowSecs);
   const isAsker =
     userAddress && survey.asker.toLowerCase() === userAddress.toLowerCase();
-  const hasAnswered = userChoice?.answered ?? false;
+  const hasAnswered = (userChoice?.answered ?? false) || submittedOption !== null;
+  const myOption = userChoice?.answered ? userChoice.option : submittedOption;
   const showResults = hasAnswered || status !== "open" || isAsker;
 
   const shares = share(tallies);
@@ -64,7 +68,7 @@ export default function QuestionnaireView({
     error: respondError,
   } = useWriteContract();
 
-  const { isLoading: isRespondWaiting } = useWaitForTransactionReceipt({
+  const { isLoading: isRespondWaiting, isSuccess: isRespondSuccess } = useWaitForTransactionReceipt({
     hash: respondTxHash,
   });
 
@@ -76,9 +80,26 @@ export default function QuestionnaireView({
     error: reclaimError,
   } = useWriteContract();
 
-  const { isLoading: isReclaimWaiting } = useWaitForTransactionReceipt({
+  const { isLoading: isReclaimWaiting, isSuccess: isReclaimSuccess } = useWaitForTransactionReceipt({
     hash: reclaimTxHash,
   });
+
+  useEffect(() => {
+    if (isRespondSuccess) {
+      if (selectedOption !== null) {
+        setSubmittedOption(selectedOption);
+      }
+      toast("success", "Answer recorded! Bounty credited to your balance.");
+      onRefresh?.();
+    }
+  }, [isRespondSuccess]);
+
+  useEffect(() => {
+    if (isReclaimSuccess) {
+      toast("success", "Unspent budget reclaimed to your balance.");
+      onRefresh?.();
+    }
+  }, [isReclaimSuccess]);
 
   const handleRespond = (opt: number) => {
     if (!isConnected) {
@@ -145,7 +166,7 @@ export default function QuestionnaireView({
           </div>
 
           <div className="text-[#5A5A5A] font-mono text-[12px]">
-            {closesIn(survey.closesAt)}
+            {closesIn(survey.closesAt, nowSecs)}
           </div>
         </div>
 
@@ -268,12 +289,12 @@ export default function QuestionnaireView({
         /* Survey State B: Results View (Answered, Full, or Closed) */
         <div className="flex flex-col gap-6 mt-2">
           {/* Answered Banner */}
-          {hasAnswered && userChoice && (
+          {hasAnswered && myOption !== null && myOption !== undefined && (
             <div className="p-4 bg-[#F0ECFF] border border-[#D6D2E6] rounded-[16px] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-[14px]">
               <div>
                 <span className="font-semibold text-[#0D0D0D]">
-                  You answered {String.fromCharCode(65 + userChoice.option)}:{" "}
-                  {options[userChoice.option]}
+                  You answered {String.fromCharCode(65 + myOption)}:{" "}
+                  {options[myOption]}
                 </span>
                 <p className="text-[13px] text-[#5A5A5A] mt-0.5">
                   {rewardBot} BOT has been credited to your balance.
@@ -350,7 +371,7 @@ export default function QuestionnaireView({
               const letter = String.fromCharCode(65 + index);
               const count = tallies[index] ?? 0;
               const pct = shares[index] ?? 0;
-              const isUserChoice = hasAnswered && userChoice?.option === index;
+              const isUserChoice = hasAnswered && myOption === index;
 
               return (
                 <div key={index} className="flex flex-col gap-1.5">

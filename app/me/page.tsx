@@ -9,6 +9,7 @@ import {
   useWriteContract,
   useWaitForTransactionReceipt,
   useChainId,
+  useBlock,
 } from "wagmi";
 import PageShell from "@/components/layout/PageShell";
 import Panel from "@/components/ui/Panel";
@@ -28,6 +29,8 @@ export default function MePage() {
   const currentChainId: BotChainId = isBotChainId(chainId) ? chainId : 968;
   const deployment = getDeployment(currentChainId);
   const deployed = isDeployed(currentChainId);
+  const { data: block } = useBlock();
+  const nowSecs = block?.timestamp ? Number(block.timestamp) : Math.floor(Date.now() / 1000);
 
   // 1. Read user's pending balance
   const {
@@ -193,7 +196,7 @@ export default function MePage() {
           ) : (
             <div className="flex flex-col gap-3">
               {createdSurveys.map((s) => {
-                const status = statusOf(s);
+                const status = statusOf(s, nowSecs);
                 const unspentSpots = remaining(s);
                 const unspentAmount = s.reward * BigInt(unspentSpots);
                 const canReclaim =
@@ -278,7 +281,7 @@ export default function MePage() {
 
           <div className="flex flex-col gap-2.5">
             {surveysWithIds.map((s) => {
-              const status = statusOf(s);
+              const status = statusOf(s, nowSecs);
               return (
                 <Link
                   key={s.id.toString()}
