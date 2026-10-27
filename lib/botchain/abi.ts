@@ -1,10 +1,257 @@
 /**
- * This project's contract ABI. Rewritten per project — it and `lib/app-config.ts` are the two
- * files every one of the fifteen replaces.
- *
- * Hand-written and `as const` rather than imported from `contracts/out`. The const assertion is
- * what gives viem and wagmi their argument and return types, and a generated JSON artifact loses
- * that unless it is cast, so a mistyped argument would only surface as a revert. Keep it narrow:
- * only the functions and events the UI actually calls.
+ * Panel contract ABI.
+ * Const assertion provides complete viem/wagmi types.
  */
-export const contractAbi = [] as const;
+export const panelAbi = [
+  {
+    type: "function",
+    name: "surveyCount",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "pending",
+    inputs: [{ name: "", type: "address", internalType: "address" }],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "create",
+    inputs: [
+      { name: "question", type: "string", internalType: "string" },
+      { name: "options", type: "string[]", internalType: "string[]" },
+      { name: "reward", type: "uint128", internalType: "uint128" },
+      { name: "maxResponses", type: "uint32", internalType: "uint32" },
+      { name: "durationSecs", type: "uint64", internalType: "uint64" },
+    ],
+    outputs: [{ name: "id", type: "uint256", internalType: "uint256" }],
+    stateMutability: "payable",
+  },
+  {
+    type: "function",
+    name: "respond",
+    inputs: [
+      { name: "id", type: "uint256", internalType: "uint256" },
+      { name: "option", type: "uint8", internalType: "uint8" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "reclaim",
+    inputs: [{ name: "id", type: "uint256", internalType: "uint256" }],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "withdraw",
+    inputs: [],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "surveyOf",
+    inputs: [{ name: "id", type: "uint256", internalType: "uint256" }],
+    outputs: [
+      {
+        name: "",
+        type: "tuple",
+        internalType: "struct Panel.Survey",
+        components: [
+          { name: "asker", type: "address", internalType: "address" },
+          { name: "reward", type: "uint128", internalType: "uint128" },
+          { name: "maxResponses", type: "uint32", internalType: "uint32" },
+          { name: "responses", type: "uint32", internalType: "uint32" },
+          { name: "closesAt", type: "uint64", internalType: "uint64" },
+          { name: "optionCount", type: "uint8", internalType: "uint8" },
+          { name: "reclaimed", type: "bool", internalType: "bool" },
+          { name: "question", type: "string", internalType: "string" },
+        ],
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "optionsOf",
+    inputs: [{ name: "id", type: "uint256", internalType: "uint256" }],
+    outputs: [{ name: "", type: "string[]", internalType: "string[]" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "tallyOf",
+    inputs: [{ name: "id", type: "uint256", internalType: "uint256" }],
+    outputs: [{ name: "", type: "uint32[]", internalType: "uint32[]" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "choiceOf",
+    inputs: [
+      { name: "id", type: "uint256", internalType: "uint256" },
+      { name: "addr", type: "address", internalType: "address" },
+    ],
+    outputs: [
+      { name: "answered", type: "bool", internalType: "bool" },
+      { name: "option", type: "uint8", internalType: "uint8" },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "latest",
+    inputs: [
+      { name: "offset", type: "uint256", internalType: "uint256" },
+      { name: "count_", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [
+      {
+        name: "surveys",
+        type: "tuple[]",
+        internalType: "struct Panel.Survey[]",
+        components: [
+          { name: "asker", type: "address", internalType: "address" },
+          { name: "reward", type: "uint128", internalType: "uint128" },
+          { name: "maxResponses", type: "uint32", internalType: "uint32" },
+          { name: "responses", type: "uint32", internalType: "uint32" },
+          { name: "closesAt", type: "uint64", internalType: "uint64" },
+          { name: "optionCount", type: "uint8", internalType: "uint8" },
+          { name: "reclaimed", type: "bool", internalType: "bool" },
+          { name: "question", type: "string", internalType: "string" },
+        ],
+      },
+      { name: "ids", type: "uint256[]", internalType: "uint256[]" },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "MAX_QUESTION",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "MIN_OPTIONS",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "MAX_OPTIONS",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "MAX_OPTION_LEN",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "MIN_RESPONSES",
+    inputs: [],
+    outputs: [{ name: "", type: "uint32", internalType: "uint32" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "MAX_RESPONSES",
+    inputs: [],
+    outputs: [{ name: "", type: "uint32", internalType: "uint32" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "MIN_DURATION",
+    inputs: [],
+    outputs: [{ name: "", type: "uint64", internalType: "uint64" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "MAX_DURATION",
+    inputs: [],
+    outputs: [{ name: "", type: "uint64", internalType: "uint64" }],
+    stateMutability: "view",
+  },
+  // Events
+  {
+    type: "event",
+    name: "Created",
+    inputs: [
+      { name: "id", type: "uint256", indexed: true, internalType: "uint256" },
+      { name: "asker", type: "address", indexed: true, internalType: "address" },
+      { name: "question", type: "string", indexed: false, internalType: "string" },
+      { name: "reward", type: "uint128", indexed: false, internalType: "uint128" },
+      { name: "maxResponses", type: "uint32", indexed: false, internalType: "uint32" },
+      { name: "closesAt", type: "uint64", indexed: false, internalType: "uint64" },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "Responded",
+    inputs: [
+      { name: "id", type: "uint256", indexed: true, internalType: "uint256" },
+      { name: "responder", type: "address", indexed: true, internalType: "address" },
+      { name: "option", type: "uint8", indexed: false, internalType: "uint8" },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "Reclaimed",
+    inputs: [
+      { name: "id", type: "uint256", indexed: true, internalType: "uint256" },
+      { name: "amount", type: "uint256", indexed: false, internalType: "uint256" },
+    ],
+    anonymous: false,
+  },
+  {
+    type: "event",
+    name: "Withdrawn",
+    inputs: [
+      { name: "account", type: "address", indexed: true, internalType: "address" },
+      { name: "amount", type: "uint256", indexed: false, internalType: "uint256" },
+    ],
+    anonymous: false,
+  },
+  // Errors
+  { type: "error", name: "BadQuestion", inputs: [] },
+  { type: "error", name: "BadOptions", inputs: [] },
+  { type: "error", name: "BadReward", inputs: [] },
+  { type: "error", name: "BadResponses", inputs: [] },
+  { type: "error", name: "BadDuration", inputs: [] },
+  {
+    type: "error",
+    name: "WrongFunding",
+    inputs: [{ name: "expected", type: "uint256", internalType: "uint256" }],
+  },
+  { type: "error", name: "NoSuchSurvey", inputs: [] },
+  { type: "error", name: "Closed", inputs: [] },
+  { type: "error", name: "Full", inputs: [] },
+  { type: "error", name: "BadOption", inputs: [] },
+  { type: "error", name: "AskerCannotRespond", inputs: [] },
+  { type: "error", name: "AlreadyResponded", inputs: [] },
+  { type: "error", name: "NotAsker", inputs: [] },
+  { type: "error", name: "AlreadyReclaimed", inputs: [] },
+  { type: "error", name: "NotClosedOrFull", inputs: [] },
+  { type: "error", name: "NothingToWithdraw", inputs: [] },
+  { type: "error", name: "TransferFailed", inputs: [] },
+  { type: "error", name: "ReentrantCall", inputs: [] },
+] as const;
+
+export const contractAbi = panelAbi;
