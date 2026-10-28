@@ -4,12 +4,8 @@ import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { parseEther, formatEther } from "viem";
-import {
-  useAccount,
-  useWriteContract,
-  useWaitForTransactionReceipt,
-  useChainId,
-} from "wagmi";
+import { useAccount, useWaitForTransactionReceipt, useChainId } from "wagmi";
+import { useWriteContract } from "@/lib/useChainWrite";
 import PageShell from "@/components/layout/PageShell";
 import Panel from "@/components/ui/Panel";
 import Button from "@/components/ui/Button";
