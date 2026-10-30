@@ -3,7 +3,8 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import { formatEther } from "viem";
-import { useAccount, useReadContract, useWaitForTransactionReceipt, useChainId, useBlock } from "wagmi";
+import { useAccount, useReadContract, useChainId, useBlock } from "wagmi";
+import { useWaitForTransactionReceipt } from "@/lib/useChainWrite";
 import { useWriteContract } from "@/lib/useChainWrite";
 import PageShell from "@/components/layout/PageShell";
 import Panel from "@/components/ui/Panel";

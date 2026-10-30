@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { formatEther, type Address } from "viem";
-import { useWaitForTransactionReceipt, useBlock } from "wagmi";
+import { useBlock } from "wagmi";
+import { useWaitForTransactionReceipt } from "@/lib/useChainWrite";
 import { useWriteContract } from "@/lib/useChainWrite";
 import Button from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
