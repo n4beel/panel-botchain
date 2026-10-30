@@ -12,7 +12,7 @@ import Button from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { panelAbi } from "@/lib/botchain/abi";
 import { getDeployment, isDeployed } from "@/lib/botchain/deployment";
-import { type BotChainId, isBotChainId } from "@/lib/botchain/chain";
+import { activeBotChain, isBotChainId, type BotChainId } from "@/lib/botchain/chain";
 import { describeError } from "@/lib/errors";
 import { remaining, statusOf, totalCost } from "@/lib/panel";
 
@@ -21,7 +21,7 @@ export default function MePage() {
   const chainId = useChainId();
   const { toast } = useToast();
 
-  const currentChainId: BotChainId = isBotChainId(chainId) ? chainId : 968;
+  const currentChainId: BotChainId = activeBotChain.id;
   const deployment = getDeployment(currentChainId);
   const deployed = isDeployed(currentChainId);
   const { data: block } = useBlock();

@@ -9,13 +9,13 @@ import Panel from "@/components/ui/Panel";
 import Button from "@/components/ui/Button";
 import { panelAbi } from "@/lib/botchain/abi";
 import { getDeployment, isDeployed } from "@/lib/botchain/deployment";
-import { type BotChainId, isBotChainId } from "@/lib/botchain/chain";
+import { activeBotChain, isBotChainId, type BotChainId } from "@/lib/botchain/chain";
 import { type SurveyData } from "@/lib/panel";
 
 export default function Home() {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
-  const currentChainId: BotChainId = isBotChainId(chainId) ? chainId : 968;
+  const currentChainId: BotChainId = activeBotChain.id;
   const deployment = getDeployment(currentChainId);
   const deployed = isDeployed(currentChainId);
 
